@@ -7,6 +7,15 @@ on:
       cookbook_name:
         required: true
         type: string
+      tailscale_key:
+        required: true
+        type: string
+      client_key:
+        required: true
+        type: string
+      chef_server_url:
+        required: true
+        type: string
     
 jobs:
   rspec:
@@ -50,10 +59,17 @@ jobs:
         uses: actionshub/markdownlint@main
   
   kitchen:
-    runs-on: [self-hosted, linux, lt]
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/head/main'
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Connect to Tailscale
+        uses: tailscale/github-actions@v1
+        with:
+          authkey: ${{ inputs.tailscale_key }}
+      - name: Install Chef
+        uses: actionshub/chef-install@main
       - name: Run Test kitchen
         run: kitchen test
       - name: Cleanup Test kitchen
@@ -61,11 +77,36 @@ jobs:
         if: always()
   
   deploy:
-    runs-on: [self-hosted, linux, lt]
-    if: github.ref == 'refs/head/master'
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/head/main'
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Connect to Tailscale
+        uses: tailscale/github-actions@v1
+        with:
+          authkey: ${{ inputs.tailscale_key }}
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Setup Knife Profiles
+        run: |
+          mkdir ~/.chef
+          cat <<EOF > ~/.chef/credentials
+          [coe-lt-tier1]
+          client_name = 'coe-cookbook-uploader'
+          client_key = """
+          ${{  inputs.client_key }}
+          """
+          chef_server_url = "${{ inputs.chef_server }}/organizations/coe-lt-tier1"
+
+          [coe-lt-tier2]
+          client_name = 'coe-cookbook-uploader'
+          client_key = """
+          ${{  inputs.client_key }}
+          """
+          chef_server_url = "${{ inputs.chef_server }}/organizations/coe-lt-tier1"
+
+          EOF
       - name: Clean and install dependencies
         run: |
           rm -rf ~/.berkself
@@ -74,6 +115,8 @@ jobs:
         run: |
           knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile coe-lt-tier1
           knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile coe-lt-tier2
-      - name: Cleanup Berkself
-        run: rm -rf ~/.berkself
+      - name: Cleanup
+        run: |
+          rm -rf ~/.chef
+          rm -rf ~/.berkself
         if: always()
