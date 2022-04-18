@@ -7,6 +7,10 @@ on:
       cookbook_name:
         required: true
         type: string
+      run_tests:
+        required: false
+        default: true
+        type: boolean
       tailscale_key:
         required: true
         type: string
@@ -58,9 +62,18 @@ jobs:
       - name: Run Markdown Lint
         uses: actionshub/markdownlint@main
   
-  kitchen:
+  version:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/head/main'
+    steps:
+      - uses: github/Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
+  
+  kitchen:
+    runs-on: ubuntu-latest
+    if: |
+      github.ref != 'refs/head/main' &&
+      inputs.run_tests
+    needs: [rspec, cookstyle, yamllint, mdl, version]
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -79,6 +92,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/head/main'
+    needs: [rspec, cookstyle, yamllint, mdl]
     steps:
       - name: Check out code
         uses: actions/checkout@v2
