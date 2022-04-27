@@ -97,7 +97,7 @@ jobs:
         run: |
           mkdir ~/.chef
           cat <<EOF > ~/.chef/credentials
-          [coe-lt-tier1]
+          [default]
           client_name = 'github-uploader'
           client_key = """
           ${{  secrets.client_key }}
@@ -138,7 +138,7 @@ jobs:
         run: |
           mkdir ~/.chef
           cat <<EOF > ~/.chef/credentials
-          [coe-lt-tier1]
+          [default]
           client_name = 'github-uploader'
           client_key = """
           ${{  secrets.client_key }}
@@ -160,7 +160,7 @@ jobs:
           berks install
       - name: Upload cookbooks to server
         run: |
-          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile coe-lt-tier1
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile default
           knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile coe-lt-tier2
         env:
           CHEF_LICENSE: accept-no-persist
