@@ -91,8 +91,8 @@ jobs:
         uses: actionshub/chef-install@main
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y virtualbox vagrant
+          sudo apt-get update
+          sudo apt-get install -y virtualbox vagrant
       - name: Run Test kitchen
         run: kitchen test
       - name: Cleanup Test kitchen
