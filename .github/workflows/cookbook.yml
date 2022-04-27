@@ -109,7 +109,7 @@ jobs:
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier2"
 
           EOF
-          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" >> /etc/hosts
+          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" | sudo tee -a /etc/hosts
       - name: Run Test kitchen
         run: kitchen test
         env:
@@ -147,7 +147,7 @@ jobs:
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier2"
 
           EOF
-          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" >> /etc/hosts
+          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" | sudo tee -a /etc/hosts
       - name: Clean and install dependencies
         run: |
           rm -rf ~/.berkself
