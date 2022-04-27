@@ -84,7 +84,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Connect to Tailscale
-        uses: tailscale/github-actions@v1
+        uses: tailscale/github-action@v1
         with:
           authkey: ${{ secrets.tailscale_key }}
       - name: Install Chef
@@ -107,7 +107,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Connect to Tailscale
-        uses: tailscale/github-actions@v1
+        uses: tailscale/github-action@v1
         with:
           authkey: ${{ secrets.tailscale_key }}
       - name: Install Chef
