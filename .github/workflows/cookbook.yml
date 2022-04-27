@@ -68,7 +68,7 @@ jobs:
     if: github.ref != 'refs/head/main'
     steps:
       - name: Ensure version is bumped
-        uses: github/Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
+        uses: Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
   
   kitchen:
     runs-on: ubuntu-latest
