@@ -66,7 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/head/main'
     steps:
-      - uses: github/Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
+      - name: Ensure version is bumped
+        uses: github/Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
   
   kitchen:
     runs-on: ubuntu-latest
@@ -83,6 +84,10 @@ jobs:
           authkey: ${{ inputs.tailscale_key }}
       - name: Install Chef
         uses: actionshub/chef-install@main
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y virtualbox vagrant
       - name: Run Test kitchen
         run: kitchen test
       - name: Cleanup Test kitchen
@@ -107,14 +112,14 @@ jobs:
           mkdir ~/.chef
           cat <<EOF > ~/.chef/credentials
           [coe-lt-tier1]
-          client_name = 'coe-cookbook-uploader'
+          client_name = 'github-uploader'
           client_key = """
           ${{  inputs.client_key }}
           """
           chef_server_url = "${{ inputs.chef_server }}/organizations/coe-lt-tier1"
 
           [coe-lt-tier2]
-          client_name = 'coe-cookbook-uploader'
+          client_name = 'github-uploader'
           client_key = """
           ${{  inputs.client_key }}
           """
