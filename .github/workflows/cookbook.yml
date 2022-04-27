@@ -95,6 +95,8 @@ jobs:
           sudo apt-get install -y virtualbox vagrant
       - name: Run Test kitchen
         run: kitchen test
+        env:
+          CHEF_LICENSE: accept-no-persist
       - name: Cleanup Test kitchen
         run: kitchen destroy
         if: always()
