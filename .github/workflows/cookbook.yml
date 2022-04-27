@@ -93,6 +93,26 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y virtualbox vagrant
+      - name: Setup Knife Profiles
+        run: |
+          mkdir ~/.chef
+          cat <<EOF > ~/.chef/credentials
+          [coe-lt-tier1]
+          client_name = 'github-uploader'
+          client_key = """
+          ${{  secrets.client_key }}
+          """
+          chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
+
+          [coe-lt-tier2]
+          client_name = 'github-uploader'
+          client_key = """
+          ${{  secrets.client_key }}
+          """
+          chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
+
+          EOF
+          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" >> /etc/hosts
       - name: Run Test kitchen
         run: kitchen test
         env:
