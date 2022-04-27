@@ -2190,10 +2190,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
+const child_process_1 = __nccwpck_require__(81);
 const gt_1 = __importDefault(__nccwpck_require__(123));
 const fs_1 = __importDefault(__nccwpck_require__(147));
 function compareVersions() {
     return __awaiter(this, void 0, void 0, function* () {
+        (0, child_process_1.execSync)('git show origin/main:metadata.rb > metadata-main.rb');
         const mainVersionData = fs_1.default.readFileSync('metadata-main.rb', 'utf-8');
         const currVersionData = fs_1.default.readFileSync('metadata.rb', 'utf-8');
         const mainVersion = mainVersionData.match(/version ['"]([0-9\.]+)['"]/);
@@ -2221,6 +2223,14 @@ void compareVersions();
 
 "use strict";
 module.exports = require("assert");
+
+/***/ }),
+
+/***/ 81:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 

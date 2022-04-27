@@ -1,8 +1,10 @@
 import * as core from '@actions/core';
+import {execSync} from 'child_process'
 import semverGt from 'semver/functions/gt'
 import fs from 'fs';
 
 async function compareVersions() {
+  execSync('git show origin/main:metadata.rb > metadata-main.rb')
   const mainVersionData = fs.readFileSync('metadata-main.rb', 'utf-8')
   const currVersionData = fs.readFileSync('metadata.rb', 'utf-8')
   const mainVersion = mainVersionData.match(/version ['"]([0-9\.]+)['"]/)
