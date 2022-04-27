@@ -67,6 +67,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/head/main'
     steps:
+      - name: Check out code
+        uses: actions/checkout@v2
       - name: Ensure version is bumped
         uses: Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
   
