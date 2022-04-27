@@ -11,18 +11,16 @@ on:
         required: false
         default: true
         type: boolean
-      tailscale_key:
-        required: true
-        type: string
-      client_key:
-        required: true
-        type: string
       chef_server_url:
         required: true
         type: string
+    secrets:
+      tailscale_key:
+        required: true
+      client_key:
+        required: true
       chef_server_ip:
         required: true
-        type: string
     
 jobs:
   rspec:
@@ -84,7 +82,7 @@ jobs:
       - name: Connect to Tailscale
         uses: tailscale/github-actions@v1
         with:
-          authkey: ${{ inputs.tailscale_key }}
+          authkey: ${{ secrets.tailscale_key }}
       - name: Install Chef
         uses: actionshub/chef-install@main
       - name: Install dependencies
@@ -107,7 +105,7 @@ jobs:
       - name: Connect to Tailscale
         uses: tailscale/github-actions@v1
         with:
-          authkey: ${{ inputs.tailscale_key }}
+          authkey: ${{ secrets.tailscale_key }}
       - name: Install Chef
         uses: actionshub/chef-install@main
       - name: Setup Knife Profiles
@@ -117,19 +115,19 @@ jobs:
           [coe-lt-tier1]
           client_name = 'github-uploader'
           client_key = """
-          ${{  inputs.client_key }}
+          ${{  secrets.client_key }}
           """
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
 
           [coe-lt-tier2]
           client_name = 'github-uploader'
           client_key = """
-          ${{  inputs.client_key }}
+          ${{  secrets.client_key }}
           """
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
 
           EOF
-          echo "${{ inputs.chef_server_ip }}  chef.tamu.edu" >> /etc/hosts
+          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" >> /etc/hosts
       - name: Clean and install dependencies
         run: |
           rm -rf ~/.berkself
