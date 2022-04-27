@@ -20,6 +20,9 @@ on:
       chef_server_url:
         required: true
         type: string
+      chef_server_ip:
+        required: true
+        type: string
     
 jobs:
   rspec:
@@ -116,16 +119,17 @@ jobs:
           client_key = """
           ${{  inputs.client_key }}
           """
-          chef_server_url = "${{ inputs.chef_server }}/organizations/coe-lt-tier1"
+          chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
 
           [coe-lt-tier2]
           client_name = 'github-uploader'
           client_key = """
           ${{  inputs.client_key }}
           """
-          chef_server_url = "${{ inputs.chef_server }}/organizations/coe-lt-tier1"
+          chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
 
           EOF
+          echo "${{ inputs.chef_server_ip }}  chef.tamu.edu" >> /etc/hosts
       - name: Clean and install dependencies
         run: |
           rm -rf ~/.berkself
