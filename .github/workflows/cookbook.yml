@@ -96,16 +96,16 @@ jobs:
       - name: Setup Knife Profiles
         run: |
           mkdir ~/.chef
-          echo "${{ secrets.client_key }}" > ~/.chef/github-uploader.pem
+          echo "${{ secrets.client_key }}" > ~/.chef/coe-sa-github.pem
           cat <<EOF > ~/.chef/credentials
           [default]
-          client_name = "github-uploader"
-          client_key = "github-uploader.pem"
+          client_name = "coe-sa-github"
+          client_key = "coe-sa-github.pem"
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
 
           [coe-lt-tier2]
-          client_name = "github-uploader"
-          client_key = "github-uploader.pem"
+          client_name = "coe-sa-github"
+          client_key = "coe-sa-github.pem"
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier2"
 
           EOF
@@ -134,16 +134,16 @@ jobs:
       - name: Setup Knife Profiles
         run: |
           mkdir ~/.chef
-          echo "${{ secrets.client_key }}" > ~/.chef/github-uploader.pem
+          echo "${{ secrets.client_key }}" > ~/.chef/coe-sa-github.pem
           cat <<EOF > ~/.chef/credentials
           [default]
-          client_name = "github-uploader"
-          client_key = "github-uploader.pem"
+          client_name = "coe-sa-github"
+          client_key = "coe-sa-github.pem"
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
 
           [coe-lt-tier2]
-          client_name = "github-uploader"
-          client_key = "github-uploader.pem"
+          client_name = "coe-sa-github"
+          client_key = "coe-sa-github.pem"
           chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier2"
 
           EOF
@@ -154,8 +154,8 @@ jobs:
           berks install
       - name: Upload cookbooks to server
         run: |
-          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile default
-          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --profile coe-lt-tier2
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --freeze --profile default
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --freeze --profile coe-lt-tier2
         env:
           CHEF_LICENSE: accept-no-persist
       - name: Cleanup
