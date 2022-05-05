@@ -79,7 +79,7 @@ jobs:
     if: |
       github.ref != 'refs/heads/main' &&
       inputs.run_tests
-    needs: [rspec, cookstyle, yamllint, mdl, version]
+    needs: [rspec, cookstyle, version]
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -121,7 +121,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [rspec, cookstyle, yamllint, mdl]
+    needs: [rspec, cookstyle]
     steps:
       - name: Check out code
         uses: actions/checkout@v2
