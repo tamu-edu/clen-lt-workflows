@@ -28,10 +28,31 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v1
+        with:
+          authkey: ${{ secrets.tailscale_key }}
       - name: Install Chef
         uses: actionshub/chef-install@main
+      - name: Setup Knife Profiles
+        run: |
+          mkdir ~/.chef
+          echo "${{ secrets.client_key }}" > ~/.chef/coe-sa-github.pem
+          cat <<EOF > ~/.chef/credentials
+          [default]
+          client_name = "coe-sa-github"
+          client_key = "coe-sa-github.pem"
+          chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier1"
+
+          [coe-lt-tier2]
+          client_name = "coe-sa-github"
+          client_key = "coe-sa-github.pem"
+          chef_server_url = "${{ inputs.chef_server_url }}/organizations/coe-lt-tier2"
+
+          EOF
+          echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" | sudo tee -a /etc/hosts
       - name: Run RSpec
-        run: /opt/chef-workstation/embedded/bin/rspec -f j -o tmp/rspec_results.json -f p
+        run: chef exec rspec -f j -o tmp/rspec_results.json -f p
         env:
           CHEF_LICENSE: accept-no-persist
 
