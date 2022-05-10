@@ -132,7 +132,9 @@ jobs:
           EOF
           echo "${{ secrets.chef_server_ip }}  chef.tamu.edu" | sudo tee -a /etc/hosts
       - name: Run Test kitchen
-        run: kitchen test --destroy=always
+        run: |
+          ip a
+          kitchen test --destroy=always
         env:
           CHEF_LICENSE: accept-no-persist
       - name: Cleanup Test kitchen
