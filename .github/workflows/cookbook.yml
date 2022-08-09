@@ -93,7 +93,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Ensure version is bumped
-        uses: Texas-A-M-College-of-Engineering/lt-workflows/cookbook-version@main
+        uses: tamu-edu/clen-lt-workflows/cookbook-version@main
   
   kitchen:
     runs-on: ubuntu-latest

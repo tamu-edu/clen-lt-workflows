@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Texas-A-M-College-of-Engineering/lt-workflows.git"
+    "url": "git+https://github.com/tamu-edu/clen-lt-workflows.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Texas-A-M-College-of-Engineering/lt-workflows/issues"
+    "url": "https://github.com/tamu-edu/clen-lt-workflows/issues"
   },
-  "homepage": "https://github.com/Texas-A-M-College-of-Engineering/lt-workflows#readme",
+  "homepage": "https://github.com/tamu-edu/clen-lt-workflows#readme",
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.1",
