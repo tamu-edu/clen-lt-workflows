@@ -1,0 +1,81 @@
+---
+name: cookbook
+
+on:
+  workflow_call:
+    inputs:
+      cookbook_name:
+        required: true
+        type: string
+      run_tests:
+        required: false
+        default: true
+        type: boolean
+    
+jobs:
+  rspec:
+    runs-on: self-hosted
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run RSpec
+        run: chef exec rspec -f j -o tmp/rspec_results.json -f p
+        env:
+          CHEF_LICENSE: accept-no-persist
+
+  cookstyle:
+    runs-on: self-hosted
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run Cookstyle
+        run: chef exec cookstyle --display-cop-names --extra-details --fail-level warning
+        env:
+          CHEF_LICENSE: accept-no-persist
+  
+  version:
+    runs-on: self-hosted
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure version is bumped
+        uses: tamu-edu/clen-lt-workflows/cookbook-version@main
+  
+  kitchen:
+    runs-on: self-hosted
+    if: |
+      github.ref != 'refs/heads/main' &&
+      inputs.run_tests
+    needs: [rspec, cookstyle, version]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run Test kitchen
+        run: |
+          ip a
+          kitchen test --destroy=always
+        env:
+          CHEF_LICENSE: accept-no-persist
+      - name: Cleanup Test kitchen
+        run: kitchen destroy
+        if: always()
+  
+  deploy:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+    needs: [rspec, cookstyle]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Clean and install dependencies
+        run: |
+          berks install
+      - name: Upload cookbooks to server
+        run: |
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --freeze --profile default
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --freeze --profile coe-lt-tier2
+        env:
+          CHEF_LICENSE: accept-no-persist
