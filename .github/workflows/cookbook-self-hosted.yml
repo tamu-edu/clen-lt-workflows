@@ -1,5 +1,5 @@
 ---
-name: cookbook
+name: cookbook-self-hosted
 
 on:
   workflow_call:
