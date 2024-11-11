@@ -63,10 +63,27 @@ jobs:
         run: kitchen destroy
         if: always()
   
-  deploy:
+  check-file-policyfile:
     runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
-    needs: [rspec, cookstyle]
+    outputs:
+      policyfile_exists: ${{ steps.check.outputs.policyfile_exists }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Check if Policyfile.rb exists
+        id: check
+        run: |
+          if [ -f ./Policyfile.rb ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+          fi
+  
+  deploy-berks:
+    runs-on: self-hosted
+    needs: [rspec, cookstyle, check-file-policyfile]
+    if: github.ref == 'refs/heads/main' && needs.check-file-policyfile.outputs.policyfile_exists == 'false'
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -79,3 +96,21 @@ jobs:
           knife cookbook upload ${{ inputs.cookbook_name }} -o "../:~/.berkshelf/cookbooks/" --include-dependencies --freeze --profile coe-lt-tier2
         env:
           CHEF_LICENSE: accept-no-persist
+  
+  deploy-policyfile:
+    runs-on: self-hosted
+    needs: [rspec, cookstyle, check-file-policyfile]
+    if: github.ref == 'refs/heads/main' && needs.check-file-policyfile.outputs.policyfile_exists == 'true'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Clean and install dependencies
+        run: |
+          rm -rf ./.exported-policies
+          chef install Policyfile.rb
+          chef update Policyfile.rb
+          chef export Policyfile.rb ./.exported-policies
+      - name: Upload policyfile to server
+        run: |
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "./.exported-policies/cookbook_artifacts" --include-dependencies --freeze --profile default
+          knife cookbook upload ${{ inputs.cookbook_name }} -o "./.exported-policies/cookbook_artifacts" --include-dependencies --freeze --profile coe-lt-tier2
