@@ -13,6 +13,23 @@ on:
         type: boolean
     
 jobs:
+  check-file-policyfile:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      policyfile_exists: ${{ steps.check.outputs.policyfile_exists }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Check if Policyfile.rb exists
+        id: check
+        run: |
+          if [ -f ./Policyfile.rb ]; then
+            echo "policyfile_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "policyfile_exists=false" >> $GITHUB_OUTPUT
+          fi
+
   rspec:
     runs-on: self-hosted
     steps:
@@ -62,23 +79,6 @@ jobs:
       - name: Cleanup Test kitchen
         run: kitchen destroy
         if: always()
-  
-  check-file-policyfile:
-    runs-on: self-hosted
-    if: github.ref == 'refs/heads/main'
-    outputs:
-      policyfile_exists: ${{ steps.check.outputs.policyfile_exists }}
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-      - name: Check if Policyfile.rb exists
-        id: check
-        run: |
-          if [ -f ./Policyfile.rb ]; then
-            echo "file_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "file_exists=false" >> $GITHUB_OUTPUT
-          fi
   
   deploy-berks:
     runs-on: self-hosted
